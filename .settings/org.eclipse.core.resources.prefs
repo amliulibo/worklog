@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+encoding//WebContent/contact/contactList.jsp=GBK
+encoding//src/com/llb=GBK
+encoding//src/com/llb/util/DbManager.java=GBK
+encoding//src/com/llb/util/Pagination.java=GBK
+encoding//src/com/llb/work/dao/ContactsDAO.java=GBK
+encoding//src/com/llb/work/dto/ContactsDTO.java=GBK
+encoding/<project>=GBK
