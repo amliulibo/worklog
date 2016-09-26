@@ -10,13 +10,14 @@
 <%@page import="java.sql.Connection"%>
 <%@page import="com.mysql.jdbc.Driver"%>
 <%@page import="java.sql.DriverManager"%>
-<%@ page language="java" contentType="text/html; charset=GBK" pageEncoding="GBK"   %>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8 " pageEncoding="UTF-8"   %>
 <jsp:directive.page import="java.sql.SQLException"/>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>ÁªÏµÈËĞÅÏ¢</title>
+<title>è”ç³»äººä¿¡æ¯</title>
 	<link rel="stylesheet" type="text/css" href="../easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="../easyui/themes/icon.css">
 <script type="text/javascript" src="../js/jquery.min.js" ></script>
@@ -63,7 +64,7 @@ function clearFilter()
 	
 	
 	try{
-		request.setCharacterEncoding("GBK");
+		request.setCharacterEncoding("UTF-8");
 		String whereClause="";
 		
 		String codeSearch= request.getParameter("code");
@@ -73,10 +74,10 @@ function clearFilter()
 		
 		
 		String contentSearch=request.getParameter("content");
-		out.println(contentSearch);
+		//out.println(contentSearch);
 		if(codeSearch!=null && codeSearch.trim().length()!=0){
 			
-			codeSearch=new String(codeSearch.getBytes("iso-8859-1"),"utf-8").trim();
+			
 			whereClause+=" and code like '%"+codeSearch+"%'";
 		}
 		if(nameSearch!=null && nameSearch.trim().length()!=0){
@@ -85,7 +86,7 @@ function clearFilter()
 			whereClause+=" and name like '%"+nameSearch+"%'";
 		}
 		if(contentSearch!=null && contentSearch.trim().length()!=0){
-			contentSearch=new String(contentSearch.getBytes("iso-8859-1"),"GBK").trim();
+			//contentSearch=new String(contentSearch.getBytes("iso-8859-1"),"GBK").trim();
 			out.println(contentSearch);
 			whereClause+=" and content like '%"+contentSearch+"%'";
 			
@@ -94,7 +95,7 @@ function clearFilter()
 		
 		
 		recordCount=ContactsDAO.getCount(whereClause);
-		pageCount=(recordCount+pageSize-1)/pageSize;//¼ÆËã×ÜÒ³Êı
+		pageCount=(recordCount+pageSize-1)/pageSize;//è®¡ç®—æ€»é¡µæ•°
 		int startRecord=(pageNum-1)*pageSize;
 		List<ContactsDTO> list=ContactsDAO.select(whereClause,startRecord,pageSize);
 		
@@ -106,27 +107,27 @@ function clearFilter()
 <form name="form1" action="contactList.jsp" method="post" onsubmit="return check()">
 
 
-<div class="easyui-panel" title="²éÑ¯Ìõ¼ş" style="width:100%">
+<div class="easyui-panel" title="æŸ¥è¯¢æ¡ä»¶" style="width:100%">
 
 	<table>
 	<tr>
-		<td style="text-align:right;">ĞĞÕşÇø»®±àÂë</td>
+		<td style="text-align:right;">è¡Œæ”¿åŒºåˆ’ç¼–ç </td>
 		<td style="text-align:left;">
 			<input type="text" name="code"  id="code" value="${param.code}" >
 		</td>
 
-		<td class="label">ĞĞÕşÇø»®Ãû³Æ</td>
+		<td class="label">è¡Œæ”¿åŒºåˆ’åç§°</td>
 		<td class="value"><input type="text" name="name" value="${param.name}"  ></td>
 	
 	
-		<td class="label">ÄÚÈİ</td>
+		<td class="label">å†…å®¹</td>
 		<td class="value"><input type="text" name="content" value="${param.content}"></td>
 	
 		<td >
-			<!-- <input type="submit" value="²éÑ¯" > 
-			<input type="button" value="Çå¿Õ" onclick="clearFilter();"> -->
-			<a href="javascript:form1.submit();" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px">²éÑ¯</a>
-			<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="clearFilter()">Çå¿Õ</a>
+			<!-- <input type="submit" value="æŸ¥è¯¢" > 
+			<input type="button" value="æ¸…ç©º" onclick="clearFilter();"> -->
+			<a href="javascript:form1.submit();" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px">æŸ¥è¯¢</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="clearFilter()">æ¸…ç©º</a>
 		</td>
 	</tr>
 	</table>
@@ -138,17 +139,17 @@ function clearFilter()
 
 <table bgcolor="#CCCCCC" cellspacing=1 cellpadding=5 width=100%>
 <tr bgcolor=#DDDDDD>
-	<th width=20px>Ñ¡Ôñ</th>
+	<th width=20px>é€‰æ‹©</th>
 	<th>#num</th>
 	<th style="display:none;">ID</th>
-	<th width=100px>Çø»®±àÂë</th>
-	<th width=150px>Çø»®Ãû³Æ</th>
-	<th width=70%>ÏêÏ¸ĞÅÏ¢</th>
+	<th width=100px>åŒºåˆ’ç¼–ç </th>
+	<th width=150px>åŒºåˆ’åç§°</th>
+	<th width=70%>è¯¦ç»†ä¿¡æ¯</th>
 	
-	<th width=100px>²Ù×÷</th>
+	<th width=100px>æ“ä½œ</th>
 </tr>
 <%
-//±éÀú½á¹û¼¯
+//éå†ç»“æœé›†
 int row=0;
 for(ContactsDTO dto:list){
 	
@@ -167,9 +168,9 @@ for(ContactsDTO dto:list){
 	out.println("	<td>"+name+"</td>");
 	out.println("	<td>"+content+"</td>");
 	out.println("	<td>");
-	out.println("	<a href='contactOperate.jsp?action=edit&id="+id+"'>ĞŞ¸Ä</a>");
-	out.println("	<a href='contactOperate.jsp?action=del&id="+id+"' onclick='return confirm(\"È·¶¨É¾³ı¸Ã¼ÇÂ¼?"
-			+"\")'>É¾³ı</a>");
+	out.println("	<a href='contactOperate.jsp?action=edit&id="+id+"'>ä¿®æ”¹</a>");
+	out.println("	<a href='contactOperate.jsp?action=del&id="+id+"' onclick='return confirm(\"ç¡®å®šåˆ é™¤è¯¥è®°å½•?"
+			+"\")'>åˆ é™¤</a>");
 	
 	out.println("	</td>");
 	out.println("		</tr>");
@@ -181,9 +182,9 @@ for(ContactsDTO dto:list){
 <tr width="100%">
 	<td width="60%" text-align ="left">
 
-		<input type="button"  value="ĞÂ½¨ÁªÏµÈË" onclick="GoAddForm()">
+		<input type="button"  value="æ–°å»ºè”ç³»äºº" onclick="GoAddForm()">
 	</td>
-	<td width="40%" align="right"> <!-- Êä³öÉÏÒ»Ò³¡¢ÏÂÒ»Ò³µÈ -->
+	<td width="40%" align="right"> <!-- è¾“å‡ºä¸Šä¸€é¡µã€ä¸‹ä¸€é¡µç­‰ -->
 	<%= Pagination.getPagination(pageNum, pageCount, recordCount, request.getRequestURI()) %>
 	</td>
 </tr>
@@ -200,7 +201,7 @@ for(ContactsDTO dto:list){
 	}
 	catch(SQLException e)
 	{
-		out.println("·¢ÉúÁËÒì³££º"+e.getMessage());
+		out.println("å‘ç”Ÿäº†å¼‚å¸¸ï¼š"+e.getMessage());
 		e.printStackTrace();
 	}
 	finally
