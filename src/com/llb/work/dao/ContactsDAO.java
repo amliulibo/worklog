@@ -121,6 +121,8 @@ public class ContactsDAO
 	{
 		
 		String sqlString="select * from t_contacts where 1=1 "+filterString+ " limit ?,?";
+		//String sqlString="select * from t_contacts where 1=1 "+filterString;
+		
 		Connection cn=null;
 		PreparedStatement preStmt=null;
 		ResultSet rs=null;

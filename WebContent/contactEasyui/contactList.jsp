@@ -20,9 +20,15 @@
 <title>联系人信息</title>
 	<link rel="stylesheet" type="text/css" href="../easyui/themes/default/easyui.css">
 	<link rel="stylesheet" type="text/css" href="../easyui/themes/icon.css">
-<script type="text/javascript" src="../js/jquery.min.js" ></script>
-<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js" ></script>
+	<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+
+
+
 <script type="text/javascript">
+
+
+//新建联系人
 var setNewHref = function()
 {
 
@@ -34,196 +40,189 @@ function check()
 	return true;
 }
 
+//提交表单
+function SubmitForm()
+{
+	document.getElementById('form1').submit();
+}
+
+//修改
+function EditForm()
+{
+	var selID=getSelID();
+	if (selID==0) {
+		$.messager.alert('提示',"请选择一行");
+		return;
+	}
+	var editAddr="contactOperate.jsp?action=edit&id="+selID;
+	
+	window.location.href=editAddr;
+}
+//删除
+function DelData()
+{
+	var selID=getSelID();
+	if (selID==0) {
+		alert("请选择一行");
+		return;
+	}
+	
+	if(!confirm("确定删除选中行？")) 
+		return;
+	
+	//var delAddr="contactOperate.jsp?action=del&id="+selID;
+	alert("del");
+	//window.location.href=delAddr;
+}
+
+//新建联系人
 function GoAddForm()
 {
 	window.location.href="addContact.jsp?code="+$("#code").val();	
 }
 
+//清空过滤条件
 function clearFilter()
 {
-	var str1="";
-	$("input[type='text']").each(function(){	
-		$(this).val("");
-		//str1+=$(this).val();
 	
-	});
-	//alert(str1);
+	/* $("input[type='text']").each(function(){	
+		$(this).textbox("clear");
+		//this.value="";
+		
+	
+	}); */ 
+	
+	$("#code").textbox('setValue',"");
+	//$("#name").textbox('setValue',"");
+	$("#name").textbox('clear');
+	$("#content").textbox('setValue',"");
+	/* $("input[type='text']").each(function (i) {
+		this.clear();
+		this.setText("");
+	}) */
+	
+	
 }
 
+function getSelID()
+{
+	var row = $('#table1').datagrid('getSelected');	
+	if (row) {
+		return row.id;
+	}
+	return 0;
+}
+
+
+
 </script>
+
+
+
+
 </head>
 <body>
 
-<%
-	final int pageSize=10;
-	int pageNum=1,pageCount=1,recordCount=0;
+
+<form id="form1" action="contactList.jsp" method="post" onsubmit="return check()">
+
+
+<table id="table1" class="easyui-datagrid" title="contact list" style="width:100%;height:400px"
+	data-options="singleSelect:true,collapsible:true,rownumbers:true
+	,footer:'#footer1',toolbar:'#filter1',pagination:true">
+	<!-- ,url:'datagrid_data1.json',method:'get',toolbar:toolbar1 --> 
 	
-	try{
-		pageNum=Integer.parseInt(request.getParameter("pageNum"));
-	}catch(Exception e){}
-	
-	
-	try{
-		request.setCharacterEncoding("UTF-8");
-		String whereClause="";
-		
-		String codeSearch= request.getParameter("code");
-		
-		
-		String nameSearch=request.getParameter("name");
-		
-		
-		String contentSearch=request.getParameter("content");
-		//out.println(contentSearch);
-		if(codeSearch!=null && codeSearch.trim().length()!=0){
+	<thead>
+		<tr >
+			<th data-options="field:'a',width:40,checkbox:true">选择</th>
+			<th data-options="field:'id',width:40">ID</th>
+			<th data-options="field:'code',width:100,align:'left'">区划编码</th>
+			<th data-options="field:'name',width:100">区划名称</th>
+			<th data-options="field:'content',width:600,align:'left'">详细信息</th>
 			
+			<!-- <th data-options="field:'c',width:60">操作</th> -->
 			
-			whereClause+=" and code like '%"+codeSearch+"%'";
-		}
-		if(nameSearch!=null && nameSearch.trim().length()!=0){
-			
-			//nameSearch=new String(nameSearch.getBytes("iso-8859-1"),"utf-8").trim();
-			whereClause+=" and name like '%"+nameSearch+"%'";
-		}
-		if(contentSearch!=null && contentSearch.trim().length()!=0){
-			//contentSearch=new String(contentSearch.getBytes("iso-8859-1"),"GBK").trim();
-			out.println(contentSearch);
-			whereClause+=" and content like '%"+contentSearch+"%'";
-			
-		}
-
 		
+		</tr>
+	</thead>
+	<div id="filter1" style="padding:2px 5px;">
+	
+		行政区划编码: <input id="code" name="code"  class="easyui-textbox" style="width:110px">
+		行政区划名称: <input id="name" name="name"   class="easyui-textbox" style="width:110px">
+		内容:  <input id="content" name="content"   class="easyui-textbox" style="width:210px">
 		
-		recordCount=ContactsDAO.getCount(whereClause);
-		pageCount=(recordCount+pageSize-1)/pageSize;//计算总页数
-		int startRecord=(pageNum-1)*pageSize;
-		List<ContactsDTO> list=ContactsDAO.select(whereClause,startRecord,pageSize);
-		
-		
-	
-%>
-
-
-<form name="form1" action="contactList.jsp" method="post" onsubmit="return check()">
-
-
-<div class="easyui-panel" title="查询条件" style="width:100%">
-
-	<table>
-	<tr>
-		<td style="text-align:right;">行政区划编码</td>
-		<td style="text-align:left;">
-			<input type="text" name="code"  id="code" value="${param.code}" >
-		</td>
-
-		<td class="label">行政区划名称</td>
-		<td class="value"><input type="text" name="name" value="${param.name}"  ></td>
-	
-	
-		<td class="label">内容</td>
-		<td class="value"><input type="text" name="content" value="${param.content}"></td>
-	
-		<td >
-			<!-- <input type="submit" value="查询" > 
-			<input type="button" value="清空" onclick="clearFilter();"> -->
-			<a href="javascript:form1.submit();" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="width:80px">查询</a>
-			<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="clearFilter()">清空</a>
-		</td>
-	</tr>
-	</table>
-
-</div>
-
-
-<br>
-
-<table bgcolor="#CCCCCC" cellspacing=1 cellpadding=5 width=100%>
-<tr bgcolor=#DDDDDD>
-	<th width=20px>选择</th>
-	<th>#num</th>
-	<th style="display:none;">ID</th>
-	<th width=100px>区划编码</th>
-	<th width=150px>区划名称</th>
-	<th width=70%>详细信息</th>
-	
-	<th width=100px>操作</th>
-</tr>
-<%
-//遍历结果集
-int row=0;
-for(ContactsDTO dto:list){
-	
-
-	int id=dto.getId();
-	String code=dto.getCode();
-	String name=dto.getName();
-	String content=dto.getContent();
-	
-	
-	out.println("<tr bgcolor=#FFFFFF>");
-	out.println("	<td><input type=checkbox name=id value="+id+"></td>");
-	out.println("	<td>"+ ++row +"</td>");
-	out.println("	<td style='display:none;'>"+id+"</td>");
-	out.println("	<td>"+code+"</td>");
-	out.println("	<td>"+name+"</td>");
-	out.println("	<td>"+content+"</td>");
-	out.println("	<td>");
-	out.println("	<a href='contactOperate.jsp?action=edit&id="+id+"'>修改</a>");
-	out.println("	<a href='contactOperate.jsp?action=del&id="+id+"' onclick='return confirm(\"确定删除该记录?"
-			+"\")'>删除</a>");
-	
-	out.println("	</td>");
-	out.println("		</tr>");
-}
-%>
-</table>
-
-<table width="100%">
-<tr width="100%">
-	<td width="60%" text-align ="left">
-
-		<input type="button"  value="新建联系人" onclick="GoAddForm()">
-	</td>
-	<td width="40%" align="right"> <!-- 输出上一页、下一页等 -->
-	<%= Pagination.getPagination(pageNum, pageCount, recordCount, request.getRequestURI()) %>
-	</td>
-</tr>
-</table>
-<br>
-
-<div class="easyui-panel">
-		<div class="easyui-pagination" data-options="total:<%=recordCount %>"></div>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-search"  onclick="queryData(0,99999);">查询</a>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-clear" onclick="clearFilter();">清空</a>
 	</div>
+	<div id="footer1" style="padding:2px 5px;">
+		<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="GoAddForm();"></a>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="false" onclick="EditForm();" ></a>
+
+		<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true"  onclick="DelData();" ></a>
+	</div>
+	
+	
+
+
+</table>
+
+
+
 
 </form>
 
-<%
-	}
-	catch(SQLException e)
-	{
-		out.println("发生了异常："+e.getMessage());
-		e.printStackTrace();
-	}
-	finally
-	{
-		
-		
-	}
-%>
 
-<table class="easyui-datagrid" title="Basic DataGrid" style="width:700px;height:250px"
-			data-options="singleSelect:true,collapsible:true,url:'datagrid_data1.json',method:'get'">
-		<thead>
-			<tr>
-				<th data-options="field:'itemid',width:80">Item ID</th>
-				<th data-options="field:'productid',width:100">Product</th>
-				<th data-options="field:'listprice',width:80,align:'right'">List Price</th>
-				<th data-options="field:'unitcost',width:80,align:'right'">Unit Cost</th>
-				<th data-options="field:'attr1',width:250">Attribute</th>
-				<th data-options="field:'status',width:60,align:'center'">Status</th>
-			</tr>
-		</thead>
-</table>
 
+	<script>
+	
+	
+
+	//设置分页控件 注意：一定要放到$(function(){里面才会生效
+	$(function(){
+		var pager = $('#table1').datagrid().datagrid('getPager');
+		pager.pagination({ 
+		     pageSize: 10,//每页显示的记录条数，默认为10 
+		    pageList: [5,10,15],//可以设置每页记录条数的列表 
+		    beforePageText: '第',//页数文本框前显示的汉字 
+		    afterPageText: '页    共 {pages} 页', 
+		    displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录' ,  
+		    onSelectPage: function (pageNumber, pageSize) {
+                queryData(pageNumber, pageSize);//分页查询
+            }
+		    /*
+		    onBeforeRefresh:function(){
+		        $(this).pagination('loading');
+		        alert('before refresh');
+		        $(this).pagination('loaded');
+		    }   */
+		}); 
+	});
+    
+		var queryData = function(pageNumber, pageSize){
+			var pageStartIndex=0;
+			if (pageNumber!=0) {
+				pageStartIndex=(pageNumber-1)*pageSize;
+			}
+			
+			
+			$.ajax({
+				url: "<%=request.getContextPath() %>/ajaxtest",
+				type: 'get',
+                dataType:'json',
+                data:"code="+$("#code").val()+"&name="+$("#name").val()+"&content="+$("#content").val()+"&pageSize="+pageSize+"&pageStart="+pageStartIndex,
+				success: function(data){
+					//$.messager.alert('警告',data);
+					//$("#panel1").html(data);
+					//$("#panel1").linkbutton({"text":data});//OK
+					//$("#ID1").text(data);//OK
+					
+					//var data1 = $.parseJSON(data);   //如果dataType为text,则需要jQuery转换
+					$("#table1").datagrid("loadData",data);
+				}
+                
+			});
+		}
+		
+	</script>
 </body>
 </html>
